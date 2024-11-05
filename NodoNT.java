@@ -12,7 +12,20 @@ public class NodoNT implements INodo {
     subD = sd;
   }
 
-  // Atribuiçao
+  // lParams
+  public NodoNT(INodo se, String id) {
+    this.op = TipoOperacao.LPARAMS;
+    subE = se;
+    ident = id;
+  }
+
+  // Param
+  public NodoNT(String id) {
+    this.op = TipoOperacao.PARAM;
+    ident = id;
+  }
+
+  // Atribuiçao, Function call
   public NodoNT(TipoOperacao op, String id, INodo se) {
     this.op = op;
     subE = se;
@@ -27,12 +40,38 @@ public class NodoNT implements INodo {
     expr = exp;
   }
 
+  // For
   public NodoNT(TipoOperacao op, INodo caseT, INodo exp, INodo caseF, INodo forCmd) {
     this.op = op;
     subE = caseT; // 1 parametro
     expr = exp; // 2 parametro
     subD = caseF; // 3 parametro
     this.forCmd = forCmd;
+  }
+
+  // Function definition
+  public NodoNT(TipoOperacao op, String id, INodo params, INodo body) {
+    this.op = op;
+    ident = id;
+    subE = params;
+    subD = body;
+  }
+
+  public NodoNT() {
+    op = TipoOperacao.NULL;
+  }
+
+  private void addToMemory(ResultValue value) {
+    String context = Parser.contextStack.peek();
+
+    SymbolTable table = Parser.contextTable.get(context);
+    if (table != null) {
+      table.put(ident, value);
+    } else {
+      table = new SymbolTable();
+      table.put(ident, value);
+      Parser.contextTable.put(context, table);
+    }
   }
 
   public ResultValue avalia() {
@@ -48,9 +87,8 @@ public class NodoNT implements INodo {
 
     else if (op == TipoOperacao.ATRIB) {
       result = subE.avalia();
-      System.out.println("ATRIB: " + ident + " <- " + result);
       Parser.memory.put(ident, result);
-      // System.out.printf("sube: %s, %s <- %f\n", subE, ident, result.getDouble());
+      addToMemory(result);
     }
 
     else if (op == TipoOperacao.IF) {
@@ -78,10 +116,38 @@ public class NodoNT implements INodo {
     } else if (op == TipoOperacao.FOR) {
       subE.avalia();
       while ((expr.avalia()).getBool()) {
-        ResultValue r = forCmd.avalia();
+        forCmd.avalia();
         subD.avalia();
       }
-    } else {
+    }
+
+    else if (op == TipoOperacao.LPARAMS) {
+      subE.avalia();
+      addToMemory(new ResultValue(0));
+    }
+
+    else if (op == TipoOperacao.PARAM) {
+      result = new ResultValue(0);
+      addToMemory(result);
+    }
+
+    else if (op == TipoOperacao.FUNC_DEF) {
+      result = new ResultValue(subD);
+      addToMemory(result);
+      Parser.contextStack.push(ident);
+      subE.avalia();
+      Parser.contextStack.pop();
+    }
+
+    else if (op == TipoOperacao.FUNC_CALL) {
+      SymbolTable table = Parser.contextTable.get(ident);
+      Parser.contextStack.push(ident);
+      // ToDo: corrigir parametros
+      ResultValue body = table.get(ident);
+      result = body.getFunction().avalia();
+    }
+
+    else {
       left = subE.avalia();
       right = subD.avalia();
       switch (op) {

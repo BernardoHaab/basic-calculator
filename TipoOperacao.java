@@ -12,5 +12,9 @@ public enum TipoOperacao {
   WHILE,
   SEQ,
   NULL,
-  FOR
+  FOR,
+  LPARAMS,
+  PARAM,
+  FUNC_DEF,
+  FUNC_CALL,
 }

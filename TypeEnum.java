@@ -1,5 +1,4 @@
 
-public enum TypeEnum
-{
-    DOUBLE, BOOLEAN;
+public enum TypeEnum {
+  DOUBLE, BOOLEAN, FUNCTION;
 }
