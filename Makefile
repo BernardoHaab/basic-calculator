@@ -1,32 +1,31 @@
-# only works with the Java extension of yacc: 
-# byacc/j from http://troi.lincom-asg.com/~rjamison/byacc/
-
-JFLEX  = jflex 
-BYACCJ = byaccj -tv -J
+JFLEX  = java -jar jflex.jar
+BYACCJ = ./yacc.linux -tv -J
 JAVAC  = javac
+OUTPUT = output
 
-# targets:
-
-all: Parser.class AppTeste.class
+# Cria a pasta OUTPUT se ela não existir
+all: $(OUTPUT) Parser.class AppTeste.class
 
 run: Parser.class
-	java Parser
+	java -cp $(OUTPUT) Parser
 
 build: clean Parser.class
 
 clean:
-	rm -f *~ *.class *.o *.s Yylex.java Parser.java y.output
+	rm -rf $(OUTPUT)/*
 
+$(OUTPUT):
+	mkdir -p $(OUTPUT)
 
 AppTeste.class: Yylex.java Parser.java *.java
-	$(JAVAC) AppTeste.java
-
+	$(JAVAC) -d $(OUTPUT) AppTeste.java
 
 Parser.class: Yylex.java Parser.java *.java
-	$(JAVAC) Parser.java
+	$(JAVAC) -d $(OUTPUT) Parser.java
 
 Yylex.java: calc.flex
 	$(JFLEX) calc.flex
 
 Parser.java: calc.y
 	$(BYACCJ) calc.y
+	mv y.output $(OUTPUT)/

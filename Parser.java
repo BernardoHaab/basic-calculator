@@ -16,11 +16,12 @@
 
 
 
-//#line 3 ".\calc.y"
+//#line 2 "calc.y"
+
   import java.io.*;
   import java.util.HashMap;
   import java.util.Stack;
-//#line 21 "Parser.java"
+//#line 22 "Parser.java"
 
 
 
@@ -365,7 +366,8 @@ final static String yyrule[] = {
 "exp : IDENT '(' lexp ')'",
 };
 
-//#line 82 ".\calc.y"
+//#line 81 "calc.y"
+
 
   public static HashMap<String, ResultValue> memory = new HashMap<>();
   public static HashMap<String, SymbolTable> contextTable = new HashMap<>();
@@ -422,7 +424,7 @@ final static String yyrule[] = {
       System.out.println("Have a nice day");
     }
   }
-//#line 354 "Parser.java"
+//#line 356 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -577,11 +579,11 @@ boolean doaction;
       {
 //########## USER-SUPPLIED ACTIONS ##########
 case 1:
-//#line 24 ".\calc.y"
+//#line 24 "calc.y"
 {yyval.obj=null;}
 break;
 case 2:
-//#line 25 ".\calc.y"
+//#line 25 "calc.y"
 { if (val_peek(0).obj != null) {
                            System.out.print("Avaliacao: " + ((INodo) val_peek(0).obj).avalia() +"\n> ");
 							yyval.obj=val_peek(0).obj;
@@ -593,128 +595,128 @@ case 2:
 					}
 break;
 case 3:
-//#line 36 ".\calc.y"
+//#line 36 "calc.y"
 { if (interactive) System.out.print("\n> "); yyval.obj = null; }
 break;
 case 4:
-//#line 37 ".\calc.y"
+//#line 37 "calc.y"
 { yyval.obj = val_peek(1).obj;
 		   System.out.println("\n= " + val_peek(1).obj);
                    if (interactive) System.out.print("\n>: "); }
 break;
 case 6:
-//#line 43 ".\calc.y"
+//#line 43 "calc.y"
 { yyval.obj = val_peek(1).obj; }
 break;
 case 7:
-//#line 44 ".\calc.y"
+//#line 44 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.IF,(INodo)val_peek(2).obj, (INodo)val_peek(0).obj, null); }
 break;
 case 8:
-//#line 45 ".\calc.y"
+//#line 45 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.IFELSE,(INodo)val_peek(4).obj, (INodo)val_peek(2).obj, (INodo)val_peek(0).obj); }
 break;
 case 9:
-//#line 46 ".\calc.y"
+//#line 46 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.WHILE,(INodo)val_peek(2).obj, (INodo)val_peek(0).obj, null); }
 break;
 case 10:
-//#line 47 ".\calc.y"
+//#line 47 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.FOR, (INodo)val_peek(6).obj, (INodo)val_peek(4).obj, (INodo)val_peek(2).obj, (INodo)val_peek(0).obj); }
 break;
 case 11:
-//#line 48 ".\calc.y"
+//#line 48 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.FUNC_DEF, val_peek(4).sval, (INodo)val_peek(2).obj, (INodo)val_peek(0).obj); }
 break;
 case 12:
-//#line 49 ".\calc.y"
+//#line 49 "calc.y"
 { yyval.obj = val_peek(1).obj; }
 break;
 case 13:
-//#line 50 ".\calc.y"
+//#line 50 "calc.y"
 { yyval.obj = new NodoNT(); }
 break;
 case 14:
-//#line 53 ".\calc.y"
+//#line 53 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.SEQ,(INodo)val_peek(1).obj,(INodo)val_peek(0).obj); }
 break;
 case 15:
-//#line 54 ".\calc.y"
+//#line 54 "calc.y"
 { yyval.obj = new NodoNT(); }
 break;
 case 16:
-//#line 57 ".\calc.y"
+//#line 57 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.SEQ,(INodo)val_peek(2).obj,(INodo)val_peek(0).obj); }
 break;
 case 17:
-//#line 58 ".\calc.y"
+//#line 58 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.SEQ,(INodo)val_peek(0).obj,null); }
 break;
 case 18:
-//#line 59 ".\calc.y"
+//#line 59 "calc.y"
 { yyval.obj = new NodoNT(); }
 break;
 case 19:
-//#line 62 ".\calc.y"
+//#line 62 "calc.y"
 { yyval.obj = new NodoNT((INodo)val_peek(2).obj,val_peek(0).sval); }
 break;
 case 20:
-//#line 63 ".\calc.y"
+//#line 63 "calc.y"
 { yyval.obj = new NodoID(val_peek(0).sval); }
 break;
 case 21:
-//#line 64 ".\calc.y"
+//#line 64 "calc.y"
 { yyval.obj = new NodoNT(); }
 break;
 case 22:
-//#line 67 ".\calc.y"
+//#line 67 "calc.y"
 { yyval.obj = new NodoTDouble(val_peek(0).dval); }
 break;
 case 23:
-//#line 68 ".\calc.y"
+//#line 68 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.ATRIB, val_peek(2).sval, (INodo)val_peek(0).obj); }
 break;
 case 24:
-//#line 69 ".\calc.y"
+//#line 69 "calc.y"
 { yyval.obj = new NodoID(val_peek(0).sval); }
 break;
 case 25:
-//#line 70 ".\calc.y"
+//#line 70 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.ADD,(INodo)val_peek(2).obj,(INodo)val_peek(0).obj); }
 break;
 case 26:
-//#line 71 ".\calc.y"
+//#line 71 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.SUB,(INodo)val_peek(2).obj,(INodo)val_peek(0).obj); }
 break;
 case 27:
-//#line 72 ".\calc.y"
+//#line 72 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.MULL,(INodo)val_peek(2).obj,(INodo)val_peek(0).obj); }
 break;
 case 28:
-//#line 73 ".\calc.y"
+//#line 73 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.DIV,(INodo)val_peek(2).obj,(INodo)val_peek(0).obj); }
 break;
 case 29:
-//#line 74 ".\calc.y"
+//#line 74 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.LESS,(INodo)val_peek(2).obj,(INodo)val_peek(0).obj); }
 break;
 case 30:
-//#line 75 ".\calc.y"
+//#line 75 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.UMINUS,(INodo)val_peek(0).obj,null); }
 break;
 case 31:
-//#line 76 ".\calc.y"
+//#line 76 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.POW,(INodo)val_peek(2).obj,(INodo)val_peek(0).obj); }
 break;
 case 32:
-//#line 77 ".\calc.y"
+//#line 77 "calc.y"
 { yyval.obj = val_peek(1).obj; }
 break;
 case 33:
-//#line 78 ".\calc.y"
+//#line 78 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.FUNC_CALL,val_peek(3).sval,(INodo)val_peek(1).obj); }
 break;
-//#line 641 "Parser.java"
+//#line 643 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####
