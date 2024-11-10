@@ -1,4 +1,4 @@
 
 public enum TypeEnum {
-  DOUBLE, BOOLEAN, FUNCTION;
+  DOUBLE, BOOLEAN, FUNCTION, PARAMS;
 }

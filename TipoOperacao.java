@@ -13,6 +13,7 @@ public enum TipoOperacao {
   SEQ,
   NULL,
   FOR,
+  LEXP,
   LPARAMS,
   PARAM,
   FUNC_DEF,

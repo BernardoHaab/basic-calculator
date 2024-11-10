@@ -15,4 +15,17 @@ public class SymbolTable {
     return table.get(key);
   }
 
+  public boolean contains(String key) {
+    return table.containsKey(key);
+  }
+
+  public HashMap<String, ResultValue> getTable() {
+    return table;
+  }
+
+  @Override
+  public String toString() {
+    return table.toString();
+  }
+
 }

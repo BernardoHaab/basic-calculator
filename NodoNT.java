@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.List;
+
 public class NodoNT implements INodo {
   private TipoOperacao op;
   private INodo subE, subD;
@@ -10,13 +13,6 @@ public class NodoNT implements INodo {
     this.op = op;
     subE = se;
     subD = sd;
-  }
-
-  // lParams
-  public NodoNT(INodo se, String id) {
-    this.op = TipoOperacao.LPARAMS;
-    subE = se;
-    ident = id;
   }
 
   // Param
@@ -63,8 +59,8 @@ public class NodoNT implements INodo {
 
   private void addToMemory(ResultValue value) {
     String context = Parser.contextStack.peek();
-
     SymbolTable table = Parser.contextTable.get(context);
+
     if (table != null) {
       table.put(ident, value);
     } else {
@@ -87,7 +83,6 @@ public class NodoNT implements INodo {
 
     else if (op == TipoOperacao.ATRIB) {
       result = subE.avalia();
-      Parser.memory.put(ident, result);
       addToMemory(result);
     }
 
@@ -111,8 +106,9 @@ public class NodoNT implements INodo {
       }
     } else if (op == TipoOperacao.SEQ) {
       subE.avalia();
-      subD.avalia();
-
+      if (subD != null) {
+        subD.avalia();
+      }
     } else if (op == TipoOperacao.FOR) {
       subE.avalia();
       while ((expr.avalia()).getBool()) {
@@ -122,29 +118,70 @@ public class NodoNT implements INodo {
     }
 
     else if (op == TipoOperacao.LPARAMS) {
+      if (subD != null) {
+        subD.avalia();
+      }
       subE.avalia();
-      addToMemory(new ResultValue(0));
     }
 
     else if (op == TipoOperacao.PARAM) {
+      SymbolTable table = Parser.contextTable.get(Parser.contextStack.peek());
+
+      if (table != null && table.get(ident) != null) {
+        // Todo: Corrigir erro
+        System.out.println("Parametro ja existe");
+        throw new RuntimeException("Parametro ja existe");
+      }
+
       result = new ResultValue(0);
       addToMemory(result);
     }
 
+    else if (op == TipoOperacao.LEXP) {
+      List<ResultValue> params = new LinkedList<>();
+
+      if (subD != null) {
+        ResultValue res = subD.avalia();
+        res.getParams().forEach(params::add);
+      }
+      ResultValue res = subE.avalia();
+      params.add(res);
+
+      result = new ResultValue(params);
+    }
+
     else if (op == TipoOperacao.FUNC_DEF) {
-      result = new ResultValue(subD);
+      NodoNT params_body = new NodoNT(TipoOperacao.SEQ, subE, subD);
+      result = new ResultValue(params_body);
       addToMemory(result);
       Parser.contextStack.push(ident);
-      subE.avalia();
       Parser.contextStack.pop();
     }
 
     else if (op == TipoOperacao.FUNC_CALL) {
-      SymbolTable table = Parser.contextTable.get(ident);
+      SymbolTable table = Parser.contextTable.get(Parser.contextStack.peek());
+
+      NodoNT params_body = table.get(ident).getFunction();
+      INodo params = params_body.subE;
+
       Parser.contextStack.push(ident);
-      // ToDo: corrigir parametros
-      ResultValue body = table.get(ident);
-      result = body.getFunction().avalia();
+      params.avalia();
+      ResultValue paramResult = subE.avalia();
+      List<ResultValue> paramsList = paramResult.getParams();
+
+      SymbolTable funcTable = Parser.contextTable.get(ident);
+      Object[] paramNames = funcTable.getTable().keySet().toArray();
+
+      String currIdent = ident;
+      for (int i = 0; i < paramNames.length; i++) {
+        String paramName = (String) paramNames[i];
+        ident = paramName;
+        addToMemory(paramsList.get(i));
+      }
+      ident = currIdent;
+      INodo body = params_body.subD;
+      result = body.avalia();
+      Parser.contextStack.pop();
     }
 
     else {
@@ -187,6 +224,16 @@ public class NodoNT implements INodo {
       result = "while (" + subE + ")" + subD;
     else if (op == TipoOperacao.UMINUS)
       result = "-" + subE;
+    else if (op == TipoOperacao.LPARAMS)
+      result = subD + ", " + subE;
+    else if (op == TipoOperacao.PARAM)
+      result = " _Param_ " + ident;
+    else if (op == TipoOperacao.FUNC_DEF)
+      result = "def " + ident + "(" + subE + ")" + subD;
+    else if (op == TipoOperacao.FUNC_CALL)
+      result = ident + "(" + subE + ")";
+    else if (op == TipoOperacao.FOR)
+      result = "for (" + subE + ";" + expr + ";" + subD + ")" + forCmd;
     else {
       switch (op) {
 
@@ -210,12 +257,20 @@ public class NodoNT implements INodo {
           opBin = " < ";
           break;
 
+        case SEQ:
+          opBin = " SEQ ";
+          break;
+
         default:
           opBin = " ? ";
       }
       result = "(" + subE + opBin + subD + ")";
     }
     return result;
+  }
+
+  public TipoOperacao getOperacao() {
+    return op;
   }
 
 }

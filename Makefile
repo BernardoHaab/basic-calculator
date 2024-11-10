@@ -4,10 +4,10 @@ JAVAC  = javac
 OUTPUT = output
 
 # Cria a pasta OUTPUT se ela não existir
-all: $(OUTPUT) Parser.class AppTeste.class
+all: $(OUTPUT) Parser.class AppTeste.class run
 
 run: Parser.class
-	java -cp $(OUTPUT) Parser
+	java -cp $(OUTPUT) Parser ./test.txt
 
 build: clean Parser.class
 

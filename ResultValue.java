@@ -1,3 +1,5 @@
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Write a description of class ResultValue here.
@@ -9,7 +11,8 @@ public class ResultValue {
   private TypeEnum type;
   private double dval;
   private boolean bval;
-  private INodo node;
+  private NodoNT node;
+  private List<ResultValue> params;
 
   public ResultValue(double val) {
     type = TypeEnum.DOUBLE;
@@ -21,9 +24,14 @@ public class ResultValue {
     bval = val;
   }
 
-  public ResultValue(INodo node) {
+  public ResultValue(NodoNT node) {
     type = TypeEnum.FUNCTION;
     this.node = node;
+  }
+
+  public ResultValue(List<ResultValue> params) {
+    type = TypeEnum.PARAMS;
+    this.params = params;
   }
 
   public double getDouble() {
@@ -34,8 +42,12 @@ public class ResultValue {
     return bval;
   }
 
-  public INodo getFunction() {
+  public NodoNT getFunction() {
     return node;
+  }
+
+  public List<ResultValue> getParams() {
+    return params;
   }
 
   public String toString() {
@@ -46,6 +58,8 @@ public class ResultValue {
         return Boolean.toString(bval);
       case FUNCTION:
         return node.toString();
+      case PARAMS:
+        return Arrays.toString(params.toArray());
     }
 
     return "erro! tipo nao tratado em ResultValue";

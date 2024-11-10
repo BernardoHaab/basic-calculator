@@ -10,7 +10,7 @@
 %token IF, WHILE, ELSE, PRINT, FOR, DEF
 %token <sval> IDENT
 
-%type <obj> exp, cmd, line, input, lcmd, lparams, lexp
+%type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp
 
 %nonassoc '='
 %nonassoc '<'
@@ -54,13 +54,16 @@ lcmd : lcmd cmd                 { $$ = new NodoNT(TipoOperacao.SEQ,(INodo)$1,(IN
      |                          { $$ = new NodoNT(); }
      ;
 
-lexp : lexp ',' exp                 { $$ = new NodoNT(TipoOperacao.SEQ,(INodo)$1,(INodo)$3); }
-     | exp                          { $$ = new NodoNT(TipoOperacao.SEQ,(INodo)$1,null); }
+lexp : lexp ',' exp                 { $$ = new NodoNT(TipoOperacao.LEXP,(INodo)$3,(INodo)$1); }
+     | exp                          { $$ = new NodoNT(TipoOperacao.LEXP,(INodo)$1, null); }
      |                              { $$ = new NodoNT(); }
      ;
 
-lparams : lparams ',' IDENT       { $$ = new NodoNT((INodo)$1,$3); }
-        | IDENT                 { $$ = new NodoID($1); }
+param : IDENT                     { $$ = new NodoNT($1); }
+      ;
+
+lparams : lparams ',' param       { $$ = new NodoNT(TipoOperacao.LPARAMS,(INodo)$3,(INodo)$1); }
+        | param                 { $$ = new NodoNT(TipoOperacao.LPARAMS,(INodo)$1,null); }
         |                       { $$ = new NodoNT(); }
         ;
 
@@ -82,12 +85,11 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
 
   public static HashMap<String, ResultValue> memory = new HashMap<>();
   public static HashMap<String, SymbolTable> contextTable = new HashMap<>();
-  public static Stack<String> contextStack = new Stack();
+  public static Stack<String> contextStack = new Stack<>();
   private Yylex lexer;
 
 
   private int yylex () {
-    contextStack.add("global");
     int yyl_return = -1;
     try {
       yylval = new ParserVal(0);
@@ -106,6 +108,7 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
 
 
   public Parser(Reader r) {
+    contextStack.add("global");
     lexer = new Yylex(r, this);
   }
 
