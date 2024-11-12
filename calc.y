@@ -7,10 +7,10 @@
 
 %token NL          /* newline  */
 %token <dval> NUM  /* a number */
-%token IF, WHILE, ELSE, PRINT, FOR, DEF
+%token IF, WHILE, ELSE, PRINT, FOR, DEF, RETURN
 %token <sval> IDENT
 
-%type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp
+%type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp, func_body
 
 %nonassoc '='
 %nonassoc '<'
@@ -40,14 +40,14 @@ line:    NL      { if (interactive) System.out.print("\n> "); $$ = null; }
        | cmd NL
        ;
 
-cmd :  exp ';'                                 { $$ = $1; }
-    |  IF '(' exp ')' cmd                      { $$ = new NodoNT(TipoOperacao.IF,(INodo)$3, (INodo)$5, null); }
-    |  IF '(' exp ')' cmd ELSE cmd             { $$ = new NodoNT(TipoOperacao.IFELSE,(INodo)$3, (INodo)$5, (INodo)$7); }
-    |  WHILE '(' exp ')' cmd                   { $$ = new NodoNT(TipoOperacao.WHILE,(INodo)$3, (INodo)$5, null); }
-    |  FOR '(' exp ';' exp ';' exp ')' cmd     { $$ = new NodoNT(TipoOperacao.FOR, (INodo)$3, (INodo)$5, (INodo)$7, (INodo)$9); }
-    |  DEF IDENT '(' lparams ')' cmd           { $$ = new NodoNT(TipoOperacao.FUNC_DEF, $2, (INodo)$4, (INodo)$6); }
-    | '{' lcmd '}'                             { $$ = $2; }
-    | error ';'                                { $$ = new NodoNT(); }
+cmd :  exp ';'                                       { $$ = $1; }
+    |  IF '(' exp ')' cmd                            { $$ = new NodoNT(TipoOperacao.IF,(INodo)$3, (INodo)$5, null); }
+    |  IF '(' exp ')' cmd ELSE cmd                   { $$ = new NodoNT(TipoOperacao.IFELSE,(INodo)$3, (INodo)$5, (INodo)$7); }
+    |  WHILE '(' exp ')' cmd                         { $$ = new NodoNT(TipoOperacao.WHILE,(INodo)$3, (INodo)$5, null); }
+    |  FOR '(' exp ';' exp ';' exp ')' cmd           { $$ = new NodoNT(TipoOperacao.FOR, (INodo)$3, (INodo)$5, (INodo)$7, (INodo)$9); }
+    |  DEF IDENT '(' lparams ')' '{' func_body '}'   { $$ = new NodoNT(TipoOperacao.FUNC_DEF, $2, (INodo)$4, (INodo)$7); }
+    | '{' lcmd '}'                                   { $$ = $2; }
+    | error ';'                                      { $$ = new NodoNT(); }
     ;
 
 lcmd : lcmd cmd                 { $$ = new NodoNT(TipoOperacao.SEQ,(INodo)$1,(INodo)$2); }
@@ -80,6 +80,11 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
        | '(' exp ')'        { $$ = $2; }
        |  IDENT '('lexp')'  { $$ = new NodoNT(TipoOperacao.FUNC_CALL,$1,(INodo)$3); }
        ;
+
+func_body: cmd RETURN exp';'  { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)$1,(INodo)$3); }
+         | cmd                { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)$1,null); }
+         | RETURN exp';'      { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)new NodoNT(),(INodo)$2); }
+         ;
 
 %%
 

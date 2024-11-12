@@ -38,6 +38,7 @@ while  { return Parser.WHILE; }
 print  { return Parser.PRINT; }
 for  { return Parser.FOR; }
 define { return Parser.DEF; }
+return { return Parser.RETURN; }
 
 
 {NL}   { return Parser.NL; }

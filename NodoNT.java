@@ -124,6 +124,13 @@ public class NodoNT implements INodo {
       subE.avalia();
     }
 
+    else if (op == TipoOperacao.FUNC_BODY) {
+      subE.avalia();
+      if (subD != null) {
+        result = subD.avalia();
+      }
+    }
+
     else if (op == TipoOperacao.PARAM) {
       SymbolTable table = Parser.contextTable.get(Parser.contextStack.peek());
 
@@ -179,8 +186,9 @@ public class NodoNT implements INodo {
         addToMemory(paramsList.get(i));
       }
       ident = currIdent;
-      INodo body = params_body.subD;
-      result = body.avalia();
+      INodo body_return = params_body.subD;
+      result = body_return.avalia();
+      System.out.println("Result (RETURN): " + result);
       Parser.contextStack.pop();
     }
 

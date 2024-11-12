@@ -1,1 +1,1 @@
-{define f(a,b) {a;} f(10,1);}
+{define f(a,b) {return a;} g=f(10,1);g;}
