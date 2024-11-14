@@ -18,5 +18,6 @@ public enum TipoOperacao {
   PARAM,
   FUNC_DEF,
   FUNC_CALL,
-  FUNC_BODY
+  FUNC_BODY,
+  RETURN
 }

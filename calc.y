@@ -10,7 +10,7 @@
 %token IF, WHILE, ELSE, PRINT, FOR, DEF, RETURN
 %token <sval> IDENT
 
-%type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp, func_body
+%type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp, block_lcmd
 
 %nonassoc '='
 %nonassoc '<'
@@ -37,18 +37,23 @@ line:    NL      { if (interactive) System.out.print("\n> "); $$ = null; }
        | exp NL  { $$ = $1;
 		   System.out.println("\n= " + $1);
                    if (interactive) System.out.print("\n>: "); }
-       | cmd NL
+       | lcmd NL
        ;
 
 cmd :  exp ';'                                       { $$ = $1; }
-    |  IF '(' exp ')' cmd                            { $$ = new NodoNT(TipoOperacao.IF,(INodo)$3, (INodo)$5, null); }
-    |  IF '(' exp ')' cmd ELSE cmd                   { $$ = new NodoNT(TipoOperacao.IFELSE,(INodo)$3, (INodo)$5, (INodo)$7); }
-    |  WHILE '(' exp ')' cmd                         { $$ = new NodoNT(TipoOperacao.WHILE,(INodo)$3, (INodo)$5, null); }
-    |  FOR '(' exp ';' exp ';' exp ')' cmd           { $$ = new NodoNT(TipoOperacao.FOR, (INodo)$3, (INodo)$5, (INodo)$7, (INodo)$9); }
-    |  DEF IDENT '(' lparams ')' '{' func_body '}'   { $$ = new NodoNT(TipoOperacao.FUNC_DEF, $2, (INodo)$4, (INodo)$7); }
-    | '{' lcmd '}'                                   { $$ = $2; }
+    |  IF '(' exp ')' block_lcmd                            { $$ = new NodoNT(TipoOperacao.IF,(INodo)$3, (INodo)$5, null); }
+    |  IF '(' exp ')' block_lcmd ELSE block_lcmd                   { $$ = new NodoNT(TipoOperacao.IFELSE,(INodo)$3, (INodo)$5, (INodo)$7); }
+    |  WHILE '(' exp ')' block_lcmd                         { $$ = new NodoNT(TipoOperacao.WHILE,(INodo)$3, (INodo)$5, null); }
+    |  FOR '(' exp ';' exp ';' exp ')' block_lcmd           { $$ = new NodoNT(TipoOperacao.FOR, (INodo)$3, (INodo)$5, (INodo)$7, (INodo)$9); }
+    |  DEF IDENT '(' lparams ')' block_lcmd   { $$ = new NodoNT(TipoOperacao.FUNC_DEF, $2, (INodo)$4, (INodo)$6); }
     | error ';'                                      { $$ = new NodoNT(); }
+    | RETURN exp ';'    { $$ = new NodoNT(TipoOperacao.RETURN, (INodo)$2, null); }
+    | RETURN ';'        { $$ = new NodoNT(TipoOperacao.RETURN,(INodo) new NodoNT(), null); }
     ;
+
+block_lcmd: '{' lcmd '}'                                   { $$ = $2; }
+          | lcmd                                           { $$ = $1; }
+          ;
 
 lcmd : lcmd cmd                 { $$ = new NodoNT(TipoOperacao.SEQ,(INodo)$1,(INodo)$2); }
      |                          { $$ = new NodoNT(); }
@@ -81,14 +86,11 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
        |  IDENT '('lexp')'  { $$ = new NodoNT(TipoOperacao.FUNC_CALL,$1,(INodo)$3); }
        ;
 
-func_body: cmd RETURN exp';'  { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)$1,(INodo)$3); }
-         | cmd                { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)$1,null); }
-         | RETURN exp';'      { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)new NodoNT(),(INodo)$2); }
-         ;
-
 %%
 
   public static Stack<HashMap<String, ResultValue>> memoryStack = new Stack<>();
+  public static HashMap<String, NodoNT> functions = new HashMap<>();
+  public static boolean isReturning = false;
   private Yylex lexer;
 
 

@@ -81,10 +81,10 @@ public class NodoNT implements INodo {
 
     if (op == TipoOperacao.UMINUS)
       result = new ResultValue(-1.0 * subE.avalia().getDouble());
+    else
 
-    else if (op == TipoOperacao.ATRIB) {
-      result = subE.avalia();
-      addToMemory(result);
+    if (op == TipoOperacao.ATRIB) {
+      addToMemory(subE.avalia());
     }
 
     else if (op == TipoOperacao.IF) {
@@ -103,17 +103,31 @@ public class NodoNT implements INodo {
 
     else if (op == TipoOperacao.WHILE) {
       while ((expr.avalia()).getBool()) {
-        subE.avalia();
+        result = subE.avalia();
       }
-    } else if (op == TipoOperacao.SEQ) {
-      subE.avalia();
-      if (subD != null) {
-        subD.avalia();
+    }
+
+    else if (op == TipoOperacao.SEQ) {
+      result = subE.avalia();
+      if (!Parser.isReturning) {
+        result = subD.avalia();
       }
-    } else if (op == TipoOperacao.FOR) {
+      // if (subE.getOperacao() == TipoOperacao.RETURN) {
+      // result = subE.avalia();
+      // } else {
+      // subE.avalia();
+      // if (subD.getOperacao() == TipoOperacao.RETURN) {
+      // result = subD.avalia();
+      // } else {
+      // subD.avalia();
+      // }
+      // }
+    }
+
+    else if (op == TipoOperacao.FOR) {
       subE.avalia();
       while ((expr.avalia()).getBool()) {
-        forCmd.avalia();
+        result = forCmd.avalia();
         subD.avalia();
       }
     }
@@ -123,13 +137,6 @@ public class NodoNT implements INodo {
         subD.avalia();
       }
       subE.avalia();
-    }
-
-    else if (op == TipoOperacao.FUNC_BODY) {
-      subE.avalia();
-      if (subD != null) {
-        result = subD.avalia();
-      }
     }
 
     else if (op == TipoOperacao.PARAM) {
@@ -160,14 +167,20 @@ public class NodoNT implements INodo {
 
     else if (op == TipoOperacao.FUNC_DEF) {
       NodoNT params_body = new NodoNT(TipoOperacao.SEQ, subE, subD);
-      result = new ResultValue(params_body);
-      addToMemory(result);
-      // Parser.contextStack.push(ident);
-      // Parser.contextStack.pop();
+      // result = new ResultValue(params_body);
+      Parser.functions.put(ident, params_body);
+      // addToMemory(result);
     }
-
+    // define g(h) { if (h<5) {return g(10);} return(h);}
     else if (op == TipoOperacao.FUNC_CALL) {
-      NodoNT params_body = Parser.memoryStack.peek().get(ident).getFunction();
+      // System.out.println(Parser.memoryStack.toString());
+      // ResultValue func = Parser.memoryStack.peek().get(ident);
+      // if (func == null) {
+      // HashMap<String, ResultValue> tmp = Parser.memoryStack.pop();
+      // func = Parser.memoryStack.peek().get(ident);
+      // Parser.memoryStack.push(tmp);
+      // }
+      NodoNT params_body = Parser.functions.get(ident);
       INodo params = params_body.subE;
 
       Parser.memoryStack.push(new HashMap<>());
@@ -186,10 +199,18 @@ public class NodoNT implements INodo {
         addToMemory(paramsList.get(i));
       }
       ident = currIdent;
-      INodo body_return = params_body.subD;
-      result = body_return.avalia();
+
+      INodo body = params_body.subD;
+      result = body.avalia();
       System.out.println("Result (RETURN): " + result);
+      Parser.isReturning = false;
+
       Parser.memoryStack.pop();
+    }
+
+    else if (op == TipoOperacao.RETURN) {
+      result = subE.avalia();
+      Parser.isReturning = true;
     }
 
     else {
