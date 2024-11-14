@@ -88,9 +88,7 @@ func_body: cmd RETURN exp';'  { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)$1
 
 %%
 
-  public static HashMap<String, ResultValue> memory = new HashMap<>();
-  public static HashMap<String, SymbolTable> contextTable = new HashMap<>();
-  public static Stack<String> contextStack = new Stack<>();
+  public static Stack<HashMap<String, ResultValue>> memoryStack = new Stack<>();
   private Yylex lexer;
 
 
@@ -113,7 +111,7 @@ func_body: cmd RETURN exp';'  { $$ = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)$1
 
 
   public Parser(Reader r) {
-    contextStack.add("global");
+    memoryStack.push(new HashMap<>());
     lexer = new Yylex(r, this);
   }
 

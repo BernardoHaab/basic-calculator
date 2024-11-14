@@ -381,9 +381,7 @@ final static String yyrule[] = {
 //#line 89 "calc.y"
 
 
-  public static HashMap<String, ResultValue> memory = new HashMap<>();
-  public static HashMap<String, SymbolTable> contextTable = new HashMap<>();
-  public static Stack<String> contextStack = new Stack<>();
+  public static Stack<HashMap<String, ResultValue>> memoryStack = new Stack<>();
   private Yylex lexer;
 
 
@@ -406,7 +404,7 @@ final static String yyrule[] = {
 
 
   public Parser(Reader r) {
-    contextStack.add("global");
+    memoryStack.push(new HashMap<>());
     lexer = new Yylex(r, this);
   }
 
@@ -436,7 +434,7 @@ final static String yyrule[] = {
       System.out.println("Have a nice day");
     }
   }
-//#line 368 "Parser.java"
+//#line 366 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -744,7 +742,7 @@ case 37:
 //#line 86 "calc.y"
 { yyval.obj = new NodoNT(TipoOperacao.FUNC_BODY,(INodo)new NodoNT(),(INodo)val_peek(1).obj); }
 break;
-//#line 671 "Parser.java"
+//#line 669 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

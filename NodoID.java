@@ -14,14 +14,9 @@ public class NodoID implements INodo {
   }
 
   public ResultValue avalia() {
-    String context = Parser.contextStack.peek();
-    SymbolTable table = Parser.contextTable.get(context);
-
-    System.out.println("NodoID: " + sval + " - " + table);
-
-    if (table.contains(sval)) {
-      System.out.println("DOUBLE_VALUE: " + table.get(sval).getDouble());
-      return new ResultValue(table.get(sval).getDouble());
+    if (Parser.memoryStack.peek().containsKey(sval)) {
+      System.out.println("DOUBLE_VALUE: " + Parser.memoryStack.peek().get(sval).getDouble());
+      return new ResultValue(Parser.memoryStack.peek().get(sval).getDouble());
     } else
       return new ResultValue(0);
   }

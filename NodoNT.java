@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,16 +59,16 @@ public class NodoNT implements INodo {
   }
 
   private void addToMemory(ResultValue value) {
-    String context = Parser.contextStack.peek();
-    SymbolTable table = Parser.contextTable.get(context);
+    // String context = Parser.contextStack.peek();
+    // SymbolTable table = Parser.contextTable.get(context);
 
-    if (table != null) {
-      table.put(ident, value);
-    } else {
-      table = new SymbolTable();
-      table.put(ident, value);
-      Parser.contextTable.put(context, table);
-    }
+    Parser.memoryStack.peek().put(ident, value);
+    // if (table != null) {
+    // } else {
+    // table = new SymbolTable();
+    // table.put(ident, value);
+    // Parser.contextTable.put(context, table);
+    // }
   }
 
   public ResultValue avalia() {
@@ -132,9 +133,9 @@ public class NodoNT implements INodo {
     }
 
     else if (op == TipoOperacao.PARAM) {
-      SymbolTable table = Parser.contextTable.get(Parser.contextStack.peek());
+      // SymbolTable table = Parser.contextTable.get(Parser.contextStack.peek());
 
-      if (table != null && table.get(ident) != null) {
+      if (Parser.memoryStack.peek().get(ident) != null) {
         // Todo: Corrigir erro
         System.out.println("Parametro ja existe");
         throw new RuntimeException("Parametro ja existe");
@@ -161,23 +162,22 @@ public class NodoNT implements INodo {
       NodoNT params_body = new NodoNT(TipoOperacao.SEQ, subE, subD);
       result = new ResultValue(params_body);
       addToMemory(result);
-      Parser.contextStack.push(ident);
-      Parser.contextStack.pop();
+      // Parser.contextStack.push(ident);
+      // Parser.contextStack.pop();
     }
 
     else if (op == TipoOperacao.FUNC_CALL) {
-      SymbolTable table = Parser.contextTable.get(Parser.contextStack.peek());
-
-      NodoNT params_body = table.get(ident).getFunction();
+      NodoNT params_body = Parser.memoryStack.peek().get(ident).getFunction();
       INodo params = params_body.subE;
 
-      Parser.contextStack.push(ident);
+      Parser.memoryStack.push(new HashMap<>());
+
+      // Define valores de parametros
       params.avalia();
       ResultValue paramResult = subE.avalia();
       List<ResultValue> paramsList = paramResult.getParams();
 
-      SymbolTable funcTable = Parser.contextTable.get(ident);
-      Object[] paramNames = funcTable.getTable().keySet().toArray();
+      Object[] paramNames = Parser.memoryStack.peek().keySet().toArray();
 
       String currIdent = ident;
       for (int i = 0; i < paramNames.length; i++) {
@@ -189,7 +189,7 @@ public class NodoNT implements INodo {
       INodo body_return = params_body.subD;
       result = body_return.avalia();
       System.out.println("Result (RETURN): " + result);
-      Parser.contextStack.pop();
+      Parser.memoryStack.pop();
     }
 
     else {
