@@ -160,6 +160,9 @@ public class NodoNT implements INodo {
         res.getParams().forEach(params::add);
       }
       ResultValue res = subE.avalia();
+      System.out.println("LEXP");
+      System.out.println(res);
+      
       params.add(res);
 
       result = new ResultValue(params);
@@ -167,27 +170,19 @@ public class NodoNT implements INodo {
 
     else if (op == TipoOperacao.FUNC_DEF) {
       NodoNT params_body = new NodoNT(TipoOperacao.SEQ, subE, subD);
-      // result = new ResultValue(params_body);
       Parser.functions.put(ident, params_body);
-      // addToMemory(result);
     }
     // define g(h) { if (h<5) {return g(10);} return(h);}
     else if (op == TipoOperacao.FUNC_CALL) {
-      // System.out.println(Parser.memoryStack.toString());
-      // ResultValue func = Parser.memoryStack.peek().get(ident);
-      // if (func == null) {
-      // HashMap<String, ResultValue> tmp = Parser.memoryStack.pop();
-      // func = Parser.memoryStack.peek().get(ident);
-      // Parser.memoryStack.push(tmp);
-      // }
       NodoNT params_body = Parser.functions.get(ident);
       INodo params = params_body.subE;
 
+      ResultValue paramResult = subE.avalia();
+      
       Parser.memoryStack.push(new HashMap<>());
+      params.avalia();
 
       // Define valores de parametros
-      params.avalia();
-      ResultValue paramResult = subE.avalia();
       List<ResultValue> paramsList = paramResult.getParams();
 
       Object[] paramNames = Parser.memoryStack.peek().keySet().toArray();

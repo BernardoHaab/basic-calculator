@@ -7,7 +7,7 @@ OUTPUT = output
 all: $(OUTPUT) Parser.class AppTeste.class run
 
 run: Parser.class
-	java -cp $(OUTPUT) Parser ./test.txt
+	java -cp $(OUTPUT) Parser ./test_rec.txt
 
 build: clean Parser.class
 
