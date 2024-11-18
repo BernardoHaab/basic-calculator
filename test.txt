@@ -1,1 +1,1 @@
-{define f(a,b) {return a;} g=f(10,1);g;}
+{ define g(a) { if(a<5) {return g(6);} return a;} b=g(3) }

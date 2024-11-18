@@ -37,7 +37,7 @@ line:    NL      { if (interactive) System.out.print("\n> "); $$ = null; }
        | exp NL  { $$ = $1;
 		   System.out.println("\n= " + $1);
                    if (interactive) System.out.print("\n>: "); }
-       | lcmd NL
+       | block_lcmd NL
        ;
 
 cmd :  exp ';'                                       { $$ = $1; }
