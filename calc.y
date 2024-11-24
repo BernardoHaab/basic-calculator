@@ -7,10 +7,10 @@
 
 %token NL          /* newline  */
 %token <dval> NUM  /* a number */
-%token IF, WHILE, ELSE, PRINT, FOR, DEF, RETURN, EQ, LTE, GTE, NOTEQ, ASSPLUS, ASSMULTI, OR, AND, NOT
+%token IF, WHILE, ELSE, PRINT, FOR, DEF, RETURN, EQ, LTE, GTE, NOTEQ, ASSPLUS, ASSMULTI, OR, AND, NOT, SHOW, help
 %token <sval> IDENT
 
-%type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp, block_lcmd
+%type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp, block_lcmd, control
 
 %nonassoc '='
 %nonassoc '<', '>', '>=', '<='
@@ -51,9 +51,15 @@ cmd :  exp ';'                                       { $$ = $1; }
     | RETURN ';'        { $$ = new NodoNT(TipoOperacao.RETURN,(INodo) new NodoNT(), null); }
     ;
 
-block_lcmd: '{' lcmd '}'                                   { $$ = $2; }
-          | lcmd                                           { $$ = $1; }
+block_lcmd: '{' lcmd '}'        { $$ = $2; }
+          | lcmd                { $$ = $1; }
+          | '#' control           { $$ = $2; }
           ;
+
+control: SHOW IDENT             { showIdent($2); }
+  | SHOW_ALL                    { showAll(); }
+  | HELP                        { help(); }
+  ;
 
 lcmd : lcmd cmd                 { $$ = new NodoNT(TipoOperacao.SEQ,(INodo)$1,(INodo)$2); }
      |                          { $$ = new NodoNT(); }
@@ -121,6 +127,28 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
     System.err.println ("Error: " + error);
   }
 
+  public void showIdent(String ident) {
+    System.out.println("Memoria: "+memoryStack.peek().get(ident));
+    System.out.println("Função: "+functions.get(ident));
+  }
+
+  public void showAll() {
+    System.out.println("Memoria: "+memoryStack);
+    System.out.println("Funções: "+functions);
+  }
+
+  public void help() {
+    System.out.println("Funcionalidades básicas da calculadora:");
+    System.out.println("1. Operações aritméticas: +, -, *, /, ^");
+    System.out.println("2. Comparações: <, >, <=, >=, ==, !=");
+    System.out.println("3. Operadores lógicos: &&, ||, !");
+    System.out.println("4. Atribuições: =, +=, *=");
+    System.out.println("5. Estruturas de controle: if, else, while, for");
+    System.out.println("6. Definição de funções: define");
+    System.out.println("7. Comandos de retorno: return");
+    System.out.println("8. Comandos de exibição: #show, #show_all");
+    System.out.println("9. Comando de ajuda: #help");
+  }
 
   public Parser(Reader r) {
     memoryStack.push(new HashMap<>());

@@ -31,6 +31,7 @@ NL  = \n | \r | \r\n
 ")" |
 "<" |
 ">" |
+"#" |
 "="   { return (int) yycharat(0); }
 
 "<=" { return Parser.LTE; }
@@ -51,6 +52,9 @@ print  { return Parser.PRINT; }
 for  { return Parser.FOR; }
 define { return Parser.DEF; }
 return { return Parser.RETURN; }
+show { return Parser.SHOW; }
+show_all { return Parser.SHOW_ALL; }
+help { return Parser.HELP; }
 
 
 {NL}   { return Parser.NL; }
