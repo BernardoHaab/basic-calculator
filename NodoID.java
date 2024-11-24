@@ -15,7 +15,6 @@ public class NodoID implements INodo {
 
   public ResultValue avalia() {
     if (Parser.memoryStack.peek().containsKey(sval)) {
-      System.out.println("DOUBLE_VALUE: " + Parser.memoryStack.peek().get(sval).getDouble());
       return new ResultValue(Parser.memoryStack.peek().get(sval).getDouble());
     } else
       return new ResultValue(0);

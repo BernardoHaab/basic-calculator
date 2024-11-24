@@ -30,7 +30,13 @@ NL  = \n | \r | \r\n
 "(" |
 ")" |
 "<" |
+">" |
 "="   { return (int) yycharat(0); }
+
+"<=" { return Parser.LTE; }
+">=" { return Parser.GTE; }
+"==" { return Parser.EQ; }
+"!=" { return Parser.NOTEQ; }
 
 if  { return Parser.IF; }
 else  { return Parser.ELSE; }

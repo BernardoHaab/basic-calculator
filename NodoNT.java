@@ -59,16 +59,7 @@ public class NodoNT implements INodo {
   }
 
   private void addToMemory(ResultValue value) {
-    // String context = Parser.contextStack.peek();
-    // SymbolTable table = Parser.contextTable.get(context);
-
     Parser.memoryStack.peek().put(ident, value);
-    // if (table != null) {
-    // } else {
-    // table = new SymbolTable();
-    // table.put(ident, value);
-    // Parser.contextTable.put(context, table);
-    // }
   }
 
   public ResultValue avalia() {
@@ -112,16 +103,6 @@ public class NodoNT implements INodo {
       if (!Parser.isReturning) {
         result = subD.avalia();
       }
-      // if (subE.getOperacao() == TipoOperacao.RETURN) {
-      // result = subE.avalia();
-      // } else {
-      // subE.avalia();
-      // if (subD.getOperacao() == TipoOperacao.RETURN) {
-      // result = subD.avalia();
-      // } else {
-      // subD.avalia();
-      // }
-      // }
     }
 
     else if (op == TipoOperacao.FOR) {
@@ -140,8 +121,6 @@ public class NodoNT implements INodo {
     }
 
     else if (op == TipoOperacao.PARAM) {
-      // SymbolTable table = Parser.contextTable.get(Parser.contextStack.peek());
-
       if (Parser.memoryStack.peek().get(ident) != null) {
         // Todo: Corrigir erro
         System.out.println("Parametro ja existe");
@@ -160,9 +139,7 @@ public class NodoNT implements INodo {
         res.getParams().forEach(params::add);
       }
       ResultValue res = subE.avalia();
-      System.out.println("LEXP");
-      System.out.println(res);
-      
+
       params.add(res);
 
       result = new ResultValue(params);
@@ -172,13 +149,13 @@ public class NodoNT implements INodo {
       NodoNT params_body = new NodoNT(TipoOperacao.SEQ, subE, subD);
       Parser.functions.put(ident, params_body);
     }
-    // define g(h) { if (h<5) {return g(10);} return(h);}
+
     else if (op == TipoOperacao.FUNC_CALL) {
       NodoNT params_body = Parser.functions.get(ident);
       INodo params = params_body.subE;
 
       ResultValue paramResult = subE.avalia();
-      
+
       Parser.memoryStack.push(new HashMap<>());
       params.avalia();
 
@@ -197,7 +174,6 @@ public class NodoNT implements INodo {
 
       INodo body = params_body.subD;
       result = body.avalia();
-      System.out.println("Result (RETURN): " + result);
       Parser.isReturning = false;
 
       Parser.memoryStack.pop();
@@ -229,6 +205,21 @@ public class NodoNT implements INodo {
           break;
         case LESS:
           result = new ResultValue(left.getDouble() < right.getDouble());
+          break;
+        case LTE:
+          result = new ResultValue(left.getDouble() <= right.getDouble());
+          break;
+        case GT:
+          result = new ResultValue(left.getDouble() > right.getDouble());
+          break;
+        case GTE:
+          result = new ResultValue(left.getDouble() >= right.getDouble());
+          break;
+        case NOTEQ:
+          result = new ResultValue(left.getDouble() != right.getDouble());
+          break;
+        case EQ:
+          result = new ResultValue(left.getDouble() == right.getDouble());
           break;
         default:
           result = new ResultValue(0);
@@ -279,6 +270,18 @@ public class NodoNT implements INodo {
 
         case LESS:
           opBin = " < ";
+          break;
+
+        case LTE:
+          opBin = " <= ";
+          break;
+
+        case GT:
+          opBin = " > ";
+          break;
+
+        case EQ:
+          opBin = " == ";
           break;
 
         case SEQ:
