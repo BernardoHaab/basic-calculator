@@ -7,14 +7,13 @@
 
 %token NL          /* newline  */
 %token <dval> NUM  /* a number */
-%token IF, WHILE, ELSE, PRINT, FOR, DEF, RETURN, EQ, LTE, GTE, NOTEQ, ASSPLUS, ASSMULTI
+%token IF, WHILE, ELSE, PRINT, FOR, DEF, RETURN, EQ, LTE, GTE, NOTEQ, ASSPLUS, ASSMULTI, OR, AND, NOT
 %token <sval> IDENT
 
 %type <obj> exp, cmd, line, input, lcmd, param, lparams, lexp, block_lcmd
 
 %nonassoc '='
-%nonassoc '<', '>'
-%nonassoc '<='
+%nonassoc '<', '>', '>=', '<='
 %left '-' '+'
 %left '*', '/'
 %left NEG          /* negation--unary minus */
@@ -82,6 +81,9 @@ exp:     NUM                { $$ = new NodoTDouble($1); }
        | exp '/' exp        { $$ = new NodoNT(TipoOperacao.DIV,(INodo)$1,(INodo)$3); }
        | exp '<' exp        { $$ = new NodoNT(TipoOperacao.LESS,(INodo)$1,(INodo)$3); }
        | exp '>' exp        { $$ = new NodoNT(TipoOperacao.GT,(INodo)$1,(INodo)$3); }
+       | exp AND exp        { $$ = new NodoNT(TipoOperacao.AND,(INodo)$1,(INodo)$3); }
+       | exp OR exp         { $$ = new NodoNT(TipoOperacao.OR,(INodo)$1,(INodo)$3); }
+       | NOT exp            { $$ = new NodoNT(TipoOperacao.NOT,(INodo)$2,null); }
        | exp LTE exp        { $$ = new NodoNT(TipoOperacao.LTE,(INodo)$1,(INodo)$3); }
        | exp GTE exp        { $$ = new NodoNT(TipoOperacao.GTE,(INodo)$1,(INodo)$3); }
        | exp NOTEQ exp      { $$ = new NodoNT(TipoOperacao.NOTEQ,(INodo)$1,(INodo)$3); }

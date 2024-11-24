@@ -184,6 +184,22 @@ public class NodoNT implements INodo {
       Parser.isReturning = true;
     }
 
+    else if (op == TipoOperacao.AND) {
+      left = subE.avalia();
+      right = subD.avalia();
+      result = new ResultValue(left.getBool() && right.getBool());
+    }
+
+    else if (op == TipoOperacao.OR) {
+      left = subE.avalia();
+      right = subD.avalia();
+      result = new ResultValue(left.getBool() || right.getBool());
+    }
+
+    else if (op == TipoOperacao.NOT) {
+      result = new ResultValue(!subE.avalia().getBool());
+    }
+
     else {
       left = subE.avalia();
       right = subD.avalia();
@@ -249,6 +265,10 @@ public class NodoNT implements INodo {
       result = ident + "(" + subE + ")";
     else if (op == TipoOperacao.FOR)
       result = "for (" + subE + ";" + expr + ";" + subD + ")" + forCmd;
+    else if (op == TipoOperacao.RETURN)
+      result = "return " + subE;
+    else if (op == TipoOperacao.NOT)
+      result = "!" + subE;
     else {
       switch (op) {
 
@@ -286,6 +306,22 @@ public class NodoNT implements INodo {
 
         case SEQ:
           opBin = " SEQ ";
+          break;
+
+        case GTE:
+          opBin = " >= ";
+          break;
+
+        case NOTEQ:
+          opBin = " != ";
+          break;
+
+        case AND:
+          opBin = " && ";
+          break;
+
+        case OR:
+          opBin = " || ";
           break;
 
         default:

@@ -24,5 +24,8 @@ public enum TipoOperacao {
   FUNC_DEF,
   FUNC_CALL,
   FUNC_BODY,
-  RETURN
+  RETURN,
+  AND,
+  OR,
+  NOT
 }

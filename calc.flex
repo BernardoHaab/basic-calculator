@@ -40,6 +40,10 @@ NL  = \n | \r | \r\n
 "+=" { return Parser.ASSPLUS; }
 "*=" { return Parser.ASSMULTI; }
 
+"&&" { return Parser.AND; }
+"||" { return Parser.OR; }
+"!" { return Parser.NOT; }
+
 if  { return Parser.IF; }
 else  { return Parser.ELSE; }
 while  { return Parser.WHILE; }
