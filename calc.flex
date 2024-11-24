@@ -37,6 +37,8 @@ NL  = \n | \r | \r\n
 ">=" { return Parser.GTE; }
 "==" { return Parser.EQ; }
 "!=" { return Parser.NOTEQ; }
+"+=" { return Parser.ASSPLUS; }
+"*=" { return Parser.ASSMULTI; }
 
 if  { return Parser.IF; }
 else  { return Parser.ELSE; }
